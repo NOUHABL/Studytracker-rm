@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Source Sans 3', sans-serif;
+  --ink:   #0D0D0D;
+  --paper: #F5F0E8;
+  --sage:  #4A7C59;
+  --amber: #D4A017;
+}
+
+/* Subtle paper texture */
+body {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(74,124,89,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(212,160,23,0.04) 0%, transparent 60%);
+}
+
+/* Smooth scrolling */
+html { scroll-behavior: smooth; }
+
+/* Selection colour */
+::selection {
+  background: var(--sage);
+  color: var(--paper);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(74,124,89,0.35); border-radius: 3px; }
+
+/* Fade-in animation */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fadeUp 0.4s ease forwards;
+}
+
+/* Pulse ring for active session */
+@keyframes pulseRing {
+  0%   { box-shadow: 0 0 0 0 rgba(74,124,89,0.4); }
+  70%  { box-shadow: 0 0 0 12px rgba(74,124,89,0); }
+  100% { box-shadow: 0 0 0 0 rgba(74,124,89,0); }
+}
+.pulse-ring { animation: pulseRing 1.8s infinite; }

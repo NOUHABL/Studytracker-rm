@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyTracker</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --ink:   #0D0D0D;
+      --paper: #F5F0E8;
+      --sage:  #4A7C59;
+      --amber: #D4A017;
+      --red:   #DC2626;
+    }
+
+    body {
+      width: 320px;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--sage);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header-icon {
+      width: 32px; height: 32px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .header h1 { font-size: 16px; font-weight: 700; }
+    .header p  { font-size: 11px; opacity: 0.7; margin-top: 1px; }
+
+    /* ── Content ── */
+    .content { padding: 16px; }
+
+    /* ── Status pill ── */
+    .status {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    .status.idle    { background: rgba(13,13,13,0.06); color: rgba(13,13,13,0.5); }
+    .status.active  { background: rgba(74,124,89,0.12); color: var(--sage); }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .status.idle   .status-dot { background: rgba(13,13,13,0.25); }
+    .status.active .status-dot { background: var(--sage); animation: pulse 1.5s infinite; }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.4; }
+    }
+
+    /* ── Auth section ── */
+    .section { margin-bottom: 14px; }
+    .label {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: rgba(13,13,13,0.4);
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%; padding: 9px 12px;
+      border: 1.5px solid rgba(13,13,13,0.1);
+      border-radius: 10px;
+      background: white;
+      font-size: 13px;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus { border-color: var(--sage); }
+    input::placeholder { color: rgba(13,13,13,0.3); }
+
+    /* ── Session info ── */
+    .session-info {
+      background: white;
+      border-radius: 12px;
+      padding: 12px 14px;
+      border: 1.5px solid rgba(74,124,89,0.2);
+      margin-bottom: 14px;
+    }
+    .session-subject { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+    .session-timer   { font-size: 22px; font-weight: 700; color: var(--sage); font-variant-numeric: tabular-nums; }
+
+    /* ── Buttons ── */
+    button {
+      width: 100%; padding: 11px;
+      border: none; border-radius: 12px;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    button:active { transform: scale(0.97); }
+    .btn-primary { background: var(--sage); color: white; }
+    .btn-primary:hover { background: #3d6b4a; }
+    .btn-danger  { background: var(--red);  color: white; margin-top: 8px; }
+    .btn-danger:hover { background: #b91c1c; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ── Error ── */
+    .error {
+      background: #fef2f2; color: var(--red);
+      border-radius: 10px; padding: 8px 12px;
+      font-size: 12px; margin-bottom: 10px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      padding: 10px 16px;
+      border-top: 1px solid rgba(13,13,13,0.06);
+      font-size: 11px; color: rgba(13,13,13,0.3);
+      text-align: center;
+    }
+    .footer a { color: var(--sage); text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="header-icon">📚</div>
+    <div>
+      <h1>StudyTracker</h1>
+      <p>Browser Activity Monitor</p>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- Status -->
+    <div class="status idle" id="status">
+      <div class="status-dot"></div>
+      <span id="status-text">Not tracking</span>
+    </div>
+
+    <!-- Error -->
+    <div class="error" id="error" style="display:none"></div>
+
+    <!-- Auth (shown when not logged in) -->
+    <div id="auth-section">
+      <div class="section">
+        <div class="label">API Token (from StudyTracker)</div>
+        <input type="password" id="token-input" placeholder="Paste your JWT token…" />
+      </div>
+      <div class="section">
+        <div class="label">Session ID</div>
+        <input type="text" id="session-input" placeholder="Start a session on the web app first" />
+      </div>
+      <button class="btn-primary" id="start-btn">Start Tracking</button>
+    </div>
+
+    <!-- Active session (shown when tracking) -->
+    <div id="active-section" style="display:none">
+      <div class="session-info">
+        <div class="session-subject" id="active-subject">–</div>
+        <div class="session-timer" id="active-timer">00:00:00</div>
+      </div>
+      <button class="btn-danger" id="stop-btn">Stop Tracking</button>
+    </div>
+  </div>
+
+  <div class="footer">
+    Open <a href="http://localhost:3000" target="_blank">StudyTracker</a> to manage sessions
+  </div>
+
+  <script src="src/popup.js"></script>
+</body>
+</html>
