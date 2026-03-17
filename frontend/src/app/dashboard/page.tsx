@@ -46,7 +46,7 @@ function BEMCountdown() {
       <div className="bg-sage text-paper rounded-3xl px-6 py-5 shadow-xl shadow-sage/20">
         <p className="text-paper/70 text-xs font-semibold uppercase tracking-widest mb-0.5">Countdown to</p>
         <h2 className="font-display text-2xl font-bold">BEM Exam 2026</h2>
-        <p className="text-paper/60 text-xs mt-0.5">June 1st, 2026 at 8:00 AM</p>
+        <p className="text-paper/60 text-xs mt-0.5">May 19th, 2026 at 8:00 AM</p>
       </div>
     );
   }
