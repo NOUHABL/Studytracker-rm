@@ -37,7 +37,8 @@ const SUBJECT_SHORT: Record<string, string> = {
 
 export default function BEMPage() {
   const router = useRouter();
-  const [progress, setProgress] = useState<Record<number, Record<string, Status>>>({});
+type BEMProgress = Record<number, Record<string, Status>>;
+const [progress, setProgress] = useState<BEMProgress>({});
   const [stats,    setStats]    = useState<{ total: number; solved: number; ongoing: number; not_yet: number } | null>(null);
   const [loading,  setLoading]  = useState(true);
   const [updating, setUpdating] = useState<string | null>(null); // "year-subject"
@@ -45,11 +46,11 @@ export default function BEMPage() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       if (!session) { router.push('/login'); return; }
-      getBEMProgress().then(d => {
-        setProgress(d.progress);
-        setStats(d.stats);
-        setLoading(false);
-      }).catch(console.error);
+     getBEMProgress().then(d => {
+  setProgress(d.progress as BEMProgress);
+  setStats(d.stats);
+  setLoading(false);
+}).catch(console.error);
     });
     return () => subscription.unsubscribe();
   }, [router]);
