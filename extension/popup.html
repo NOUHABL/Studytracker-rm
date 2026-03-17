@@ -2,133 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>StudyTracker</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     :root {
-      --ink:   #0D0D0D;
-      --paper: #F5F0E8;
-      --sage:  #4A7C59;
-      --amber: #D4A017;
-      --red:   #DC2626;
+      --ink: #0D0D0D; --paper: #F5F0E8;
+      --sage: #4A7C59; --amber: #D4A017; --red: #DC2626;
     }
+    body { width: 320px; font-family: 'Segoe UI', system-ui, sans-serif; background: var(--paper); color: var(--ink); font-size: 14px; }
 
-    body {
-      width: 320px;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: var(--paper);
-      color: var(--ink);
-      font-size: 14px;
-    }
-
-    /* ── Header ── */
-    .header {
-      background: var(--sage);
-      color: white;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .header-icon {
-      width: 32px; height: 32px;
-      background: rgba(255,255,255,0.2);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 16px;
-    }
+    /* Header */
+    .header { background: var(--sage); color: white; padding: 16px 20px; display: flex; align-items: center; gap: 10px; }
+    .header-icon { width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
     .header h1 { font-size: 16px; font-weight: 700; }
     .header p  { font-size: 11px; opacity: 0.7; margin-top: 1px; }
 
-    /* ── Content ── */
-    .content { padding: 16px; }
+    /* BEM Countdown */
+    .bem { margin: 12px 16px 0; border-radius: 14px; padding: 12px 14px; color: white; }
+    .bem.green  { background: var(--sage); }
+    .bem.amber  { background: var(--amber); color: var(--ink); }
+    .bem.red    { background: var(--red); }
+    .bem.over   { background: var(--amber); color: var(--ink); text-align: center; font-weight: 700; }
+    .bem-label  { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.7; margin-bottom: 4px; }
+    .bem-title  { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .bem-units  { display: flex; align-items: center; gap: 5px; }
+    .bem-unit   { text-align: center; flex: 1; }
+    .bem-value  { background: rgba(255,255,255,0.25); border-radius: 8px; padding: 4px 2px; font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .bem.amber .bem-value { background: rgba(0,0,0,0.12); }
+    .bem-unit-label { font-size: 9px; font-weight: 700; text-transform: uppercase; opacity: 0.65; margin-top: 3px; }
+    .bem-sep { font-size: 14px; font-weight: 800; opacity: 0.4; margin-bottom: 12px; }
 
-    /* ── Status pill ── */
-    .status {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 14px;
-    }
-    .status.idle    { background: rgba(13,13,13,0.06); color: rgba(13,13,13,0.5); }
-    .status.active  { background: rgba(74,124,89,0.12); color: var(--sage); }
-    .status-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-    }
+    /* Content */
+    .content { padding: 12px 16px 16px; }
+
+    /* Status */
+    .status { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+    .status.idle   { background: rgba(13,13,13,0.06); color: rgba(13,13,13,0.5); }
+    .status.active { background: rgba(74,124,89,0.12); color: var(--sage); }
+    .status.error  { background: #fef2f2; color: var(--red); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
     .status.idle   .status-dot { background: rgba(13,13,13,0.25); }
     .status.active .status-dot { background: var(--sage); animation: pulse 1.5s infinite; }
+    .status.error  .status-dot { background: var(--red); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 
-    @keyframes pulse {
-      0%,100% { opacity: 1; }
-      50%      { opacity: 0.4; }
-    }
-
-    /* ── Auth section ── */
-    .section { margin-bottom: 14px; }
-    .label {
-      font-size: 10px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 0.08em;
-      color: rgba(13,13,13,0.4);
-      margin-bottom: 6px;
-    }
-
-    input {
-      width: 100%; padding: 9px 12px;
-      border: 1.5px solid rgba(13,13,13,0.1);
-      border-radius: 10px;
-      background: white;
-      font-size: 13px;
-      color: var(--ink);
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    input:focus { border-color: var(--sage); }
-    input::placeholder { color: rgba(13,13,13,0.3); }
-
-    /* ── Session info ── */
-    .session-info {
-      background: white;
-      border-radius: 12px;
-      padding: 12px 14px;
-      border: 1.5px solid rgba(74,124,89,0.2);
-      margin-bottom: 14px;
-    }
-    .session-subject { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+    /* Session info */
+    .session-box { background: white; border-radius: 12px; padding: 12px 14px; border: 1.5px solid rgba(74,124,89,0.2); margin-bottom: 12px; }
+    .session-subject { font-weight: 700; font-size: 15px; margin-bottom: 2px; }
     .session-timer   { font-size: 22px; font-weight: 700; color: var(--sage); font-variant-numeric: tabular-nums; }
 
-    /* ── Buttons ── */
-    button {
-      width: 100%; padding: 11px;
-      border: none; border-radius: 12px;
-      font-size: 13px; font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
+    /* Info box */
+    .info-box { background: white; border-radius: 12px; padding: 12px 14px; border: 1.5px solid rgba(13,13,13,0.08); margin-bottom: 12px; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .info-label { font-size: 11px; color: rgba(13,13,13,0.4); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+    .info-value { font-size: 12px; font-weight: 700; color: var(--ink); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .info-value.good { color: var(--sage); }
+    .info-value.bad  { color: var(--red); }
+
+    /* Buttons */
+    button { width: 100%; padding: 11px; border: none; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; }
     button:active { transform: scale(0.97); }
-    .btn-primary { background: var(--sage); color: white; }
-    .btn-primary:hover { background: #3d6b4a; }
-    .btn-danger  { background: var(--red);  color: white; margin-top: 8px; }
-    .btn-danger:hover { background: #b91c1c; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--sage); color: white; }
+    .btn-primary:hover:not(:disabled) { background: #3d6b4a; }
+    .btn-secondary { background: rgba(13,13,13,0.07); color: var(--ink); margin-top: 8px; }
+    .btn-secondary:hover:not(:disabled) { background: rgba(13,13,13,0.12); }
+    .btn-danger { background: var(--red); color: white; margin-top: 8px; }
+    .btn-danger:hover:not(:disabled) { background: #b91c1c; }
 
-    /* ── Error ── */
-    .error {
-      background: #fef2f2; color: var(--red);
-      border-radius: 10px; padding: 8px 12px;
-      font-size: 12px; margin-bottom: 10px;
-    }
-
-    /* ── Footer ── */
-    .footer {
-      padding: 10px 16px;
-      border-top: 1px solid rgba(13,13,13,0.06);
-      font-size: 11px; color: rgba(13,13,13,0.3);
-      text-align: center;
-    }
+    /* Footer */
+    .footer { padding: 10px 16px; border-top: 1px solid rgba(13,13,13,0.06); font-size: 11px; color: rgba(13,13,13,0.3); text-align: center; }
     .footer a { color: var(--sage); text-decoration: none; font-weight: 600; }
   </style>
 </head>
@@ -142,41 +85,58 @@
     </div>
   </div>
 
+  <!-- BEM Countdown -->
+  <div class="bem green" id="bem">
+    <div class="bem-label">Countdown to</div>
+    <div class="bem-title">BEM Exam 2026 — June 1st, 8:00 AM</div>
+    <div class="bem-units">
+      <div class="bem-unit"><div class="bem-value" id="b-d">00</div><div class="bem-unit-label">Days</div></div>
+      <div class="bem-sep">:</div>
+      <div class="bem-unit"><div class="bem-value" id="b-h">00</div><div class="bem-unit-label">Hrs</div></div>
+      <div class="bem-sep">:</div>
+      <div class="bem-unit"><div class="bem-value" id="b-m">00</div><div class="bem-unit-label">Min</div></div>
+      <div class="bem-sep">:</div>
+      <div class="bem-unit"><div class="bem-value" id="b-s">00</div><div class="bem-unit-label">Sec</div></div>
+    </div>
+  </div>
+
   <div class="content">
-    <!-- Status -->
+
+    <!-- Status bar -->
     <div class="status idle" id="status">
       <div class="status-dot"></div>
       <span id="status-text">Not tracking</span>
     </div>
 
-    <!-- Error -->
-    <div class="error" id="error" style="display:none"></div>
-
-    <!-- Auth (shown when not logged in) -->
-    <div id="auth-section">
-      <div class="section">
-        <div class="label">API Token (from StudyTracker)</div>
-        <input type="password" id="token-input" placeholder="Paste your JWT token…" />
+    <!-- NOT tracking: auto-connect panel -->
+    <div id="idle-section">
+      <div class="info-box" id="info-box">
+        <div class="info-row">
+          <span class="info-label">Auth</span>
+          <span class="info-value" id="info-auth">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Active session</span>
+          <span class="info-value" id="info-session">—</span>
+        </div>
       </div>
-      <div class="section">
-        <div class="label">Session ID</div>
-        <input type="text" id="session-input" placeholder="Start a session on the web app first" />
-      </div>
-      <button class="btn-primary" id="start-btn">Start Tracking</button>
+      <button class="btn-primary" id="auto-btn">Auto-connect from tab</button>
+      <button class="btn-secondary" id="refresh-btn">Refresh session list</button>
     </div>
 
-    <!-- Active session (shown when tracking) -->
+    <!-- TRACKING: active session panel -->
     <div id="active-section" style="display:none">
-      <div class="session-info">
-        <div class="session-subject" id="active-subject">–</div>
-        <div class="session-timer" id="active-timer">00:00:00</div>
+      <div class="session-box">
+        <div class="session-subject" id="active-subject">—</div>
+        <div class="session-timer"   id="active-timer">00:00:00</div>
       </div>
       <button class="btn-danger" id="stop-btn">Stop Tracking</button>
     </div>
+
   </div>
 
   <div class="footer">
-    Open <a href="http://localhost:3000" target="_blank">StudyTracker</a> to manage sessions
+    Open <a href="http://localhost:3000" target="_blank">StudyTracker</a> · keep tab open while tracking
   </div>
 
   <script src="src/popup.js"></script>

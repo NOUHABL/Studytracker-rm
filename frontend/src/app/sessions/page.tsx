@@ -7,7 +7,8 @@ import SessionForm    from '@/components/session/SessionForm';
 import SessionTimer   from '@/components/session/SessionTimer';
 import SessionHistory from '@/components/session/SessionHistory';
 import { startSession, endSession, listSessions, getActiveSession } from '@/lib/api';
-import type { StudySession } from '@/types';
+import { supabase } from '@/lib/supabase';
+import type { StudySession, TaskType } from '@/types';
 
 export default function SessionsPage() {
   const [active,   setActive]   = useState<StudySession | null>(null);
@@ -18,22 +19,29 @@ export default function SessionsPage() {
   const [error,    setError]    = useState('');
 
   const refresh = useCallback(async () => {
-    const [activeRes, listRes] = await Promise.all([
-      getActiveSession(),
-      listSessions({ limit: 50 }),
-    ]);
-    setActive(activeRes.session);
-    setSessions(listRes.sessions);
+    try {
+      const [activeRes, listRes] = await Promise.all([
+        getActiveSession(),
+        listSessions({ limit: 50 }),
+      ]);
+      setActive(activeRes.session);
+      setSessions(listRes.sessions);
+    } catch (e) { console.error(e); }
     setLoading(false);
   }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      if (session) refresh();
+    });
+    return () => subscription.unsubscribe();
+  }, [refresh]);
 
-  async function handleStart(subject: string, difficulty: string, notes: string) {
+  async function handleStart(subject: string, task_type: TaskType, lesson_name: string) {
     setStarting(true);
     setError('');
     try {
-      const { session } = await startSession({ subject, difficulty, notes });
+      const { session } = await startSession({ subject, task_type, lesson_name });
       setActive(session);
       setSessions(prev => [session, ...prev]);
     } catch (e: unknown) {
@@ -77,11 +85,10 @@ export default function SessionsPage() {
               )}
             </Card>
 
-            {/* Quick tips */}
             <div className="mt-4 p-4 rounded-2xl border border-ink/8 bg-white/40 text-xs text-ink/40 space-y-1.5">
               <p className="font-semibold text-ink/50 text-xs uppercase tracking-wider mb-2">💡 Tips</p>
-              <p>Install the Chrome extension to auto-track browsing activity during sessions.</p>
-              <p>Use notes to record topics covered, e.g. "BEM 2021 exercises".</p>
+              <p>Choose <strong>BEM Prep</strong> to track your exam preparation sessions separately.</p>
+              <p>Add a lesson name so you can see exactly what you covered in each session.</p>
             </div>
           </div>
 

@@ -25,6 +25,34 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${playfair.variable} ${sourceSans.variable}`}>
       <body className="font-body bg-paper text-ink antialiased min-h-screen">
         {children}
+        {/* Bridge script: lets the Chrome extension read session data */}
+        <script dangerouslySetInnerHTML={{ __html: `
+          window.__STUDYTRACKER_BRIDGE__ = true;
+          window.addEventListener('message', async function(event) {
+            if (event.source !== window) return;
+            if (event.data?.type !== 'ST_GET_SESSION') return;
+            try {
+              const keys = Object.keys(localStorage);
+              const authKey = keys.find(k => k.includes('auth-token') || k.includes('supabase'));
+              if (!authKey) {
+                window.postMessage({ type: 'ST_SESSION_RESPONSE', error: 'Not logged in' }, '*');
+                return;
+              }
+              const raw = localStorage.getItem(authKey);
+              const parsed = JSON.parse(raw);
+              // Supabase stores session under .session or directly
+              const session = parsed?.session || parsed;
+              const token = session?.access_token;
+              if (!token) {
+                window.postMessage({ type: 'ST_SESSION_RESPONSE', error: 'No token found' }, '*');
+                return;
+              }
+              window.postMessage({ type: 'ST_SESSION_RESPONSE', token }, '*');
+            } catch(e) {
+              window.postMessage({ type: 'ST_SESSION_RESPONSE', error: e.message }, '*');
+            }
+          });
+        `}} />
       </body>
     </html>
   );

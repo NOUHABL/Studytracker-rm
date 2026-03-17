@@ -2,13 +2,20 @@
 
 import { useEffect, useState } from 'react';
 import { formatTimer } from '@/lib/utils';
-import type { StudySession } from '@/types';
+import type { StudySession, TaskType } from '@/types';
 
 interface Props {
   session: StudySession;
   onEnd: () => void;
   ending?: boolean;
 }
+
+const TASK_ICONS: Record<TaskType, string> = {
+  lesson:   '📖',
+  exercise: '✏️',
+  subject:  '📚',
+  bem:      '🎯',
+};
 
 export default function SessionTimer({ session, onEnd, ending }: Props) {
   const [elapsed, setElapsed] = useState(0);
@@ -31,12 +38,19 @@ export default function SessionTimer({ session, onEnd, ending }: Props) {
 
       {/* Subject */}
       <h2 className="font-display text-2xl text-ink mb-1">{session.subject}</h2>
-      {session.difficulty && (
-        <p className="text-ink/40 text-sm capitalize mb-6">{session.difficulty}</p>
+
+      {/* Task type + lesson name */}
+      {session.task_type && (
+        <p className="text-ink/50 text-sm mb-1">
+          {TASK_ICONS[session.task_type]} {session.task_type}
+          {session.lesson_name && (
+            <span className="ml-2 text-ink/40">— {session.lesson_name}</span>
+          )}
+        </p>
       )}
 
       {/* Timer */}
-      <div className="font-display text-6xl text-ink tracking-tight mb-2">
+      <div className="font-display text-6xl text-ink tracking-tight mt-4 mb-2">
         {formatTimer(elapsed)}
       </div>
       <p className="text-ink/40 text-xs mb-8">hh : mm : ss</p>

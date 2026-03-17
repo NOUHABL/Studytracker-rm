@@ -1,7 +1,5 @@
-// ── Shared TypeScript types ───────────────────────────────────
-
-export type Role = 'student' | 'viewer';
-export type Difficulty = 'easy' | 'medium' | 'hard';
+export type Role       = 'student' | 'viewer';
+export type TaskType   = 'lesson' | 'exercise' | 'subject' | 'bem';
 
 export interface User {
   id: string;
@@ -17,9 +15,9 @@ export interface StudySession {
   subject: string;
   start_time: string;
   end_time: string | null;
-  duration: number | null; // minutes
-  difficulty: Difficulty | null;
-  notes: string | null;
+  duration: number | null;
+  task_type: TaskType | null;
+  lesson_name: string | null;
   created_at: string;
 }
 
@@ -28,7 +26,7 @@ export interface BrowsingActivity {
   session_id: string;
   url: string;
   domain: string;
-  time_spent: number; // seconds
+  time_spent: number;
   timestamp: string;
 }
 
@@ -49,4 +47,27 @@ export interface WeekStats {
 export interface SubjectStat {
   subject: string;
   minutes: number;
+}
+
+export interface TaskStat {
+  task_type: TaskType;
+  minutes: number;
+  sessions: number;
+}
+
+export interface Task {
+  id: string;
+  user_id: string;
+  subject: string;
+  title: string;
+  task_type: TaskType;
+  completed: boolean;
+  created_at: string;
+}
+
+export interface SubjectProgress {
+  subject: string;
+  total: number;
+  completed: number;
+  percent: number;
 }

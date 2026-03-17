@@ -2,17 +2,17 @@ const supabase = require('../config/supabase');
 
 // ── POST /sessions/start ──────────────────────────────────────
 async function startSession(req, res) {
-  const { subject, difficulty, notes } = req.body;
+  const { subject, task_type, lesson_name } = req.body;
   if (!subject) return res.status(400).json({ error: 'subject is required' });
 
   const { data, error } = await supabase
     .from('study_sessions')
     .insert({
-      user_id:    req.user.id,
+      user_id:     req.user.id,
       subject,
-      difficulty: difficulty || null,
-      notes:      notes      || null,
-      start_time: new Date().toISOString(),
+      task_type,
+      lesson_name: lesson_name || null,
+      start_time:  new Date().toISOString(),
     })
     .select()
     .single();
@@ -23,10 +23,9 @@ async function startSession(req, res) {
 
 // ── POST /sessions/end ────────────────────────────────────────
 async function endSession(req, res) {
-  const { session_id, notes, difficulty } = req.body;
+  const { session_id, lesson_name } = req.body;
   if (!session_id) return res.status(400).json({ error: 'session_id is required' });
 
-  // Fetch the session to calculate duration
   const { data: existing, error: fetchErr } = await supabase
     .from('study_sessions')
     .select('*')
@@ -38,15 +37,14 @@ async function endSession(req, res) {
   if (existing.end_time)     return res.status(400).json({ error: 'Session already ended' });
 
   const end_time = new Date();
-  const duration = Math.round((end_time - new Date(existing.start_time)) / 60000); // minutes
+  const duration = Math.round((end_time - new Date(existing.start_time)) / 60000);
 
   const { data, error } = await supabase
     .from('study_sessions')
     .update({
-      end_time:   end_time.toISOString(),
+      end_time,
       duration,
-      notes:      notes      ?? existing.notes,
-      difficulty: difficulty ?? existing.difficulty,
+      lesson_name: lesson_name ?? existing.lesson_name,
     })
     .eq('id', session_id)
     .select()

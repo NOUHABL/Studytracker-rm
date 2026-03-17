@@ -2,14 +2,22 @@
 
 import { formatDate, formatTime, formatDuration } from '@/lib/utils';
 import { Badge } from '@/components/ui';
-import type { StudySession } from '@/types';
+import type { StudySession, TaskType } from '@/types';
 
 interface Props { sessions: StudySession[]; loading?: boolean; }
 
-const DIFFICULTY_COLORS: Record<string, string> = {
-  easy:   '#059669',
-  medium: '#D97706',
-  hard:   '#DC2626',
+const TASK_COLORS: Record<TaskType, string> = {
+  lesson:   '#3C6EA6',
+  exercise: '#4A7C59',
+  subject:  '#7C4A7C',
+  bem:      '#D4A017',
+};
+
+const TASK_ICONS: Record<TaskType, string> = {
+  lesson:   '📖',
+  exercise: '✏️',
+  subject:  '📚',
+  bem:      '🎯',
 };
 
 export default function SessionHistory({ sessions, loading }: Props) {
@@ -40,33 +48,34 @@ export default function SessionHistory({ sessions, loading }: Props) {
           <tr className="text-left text-ink/40 text-xs uppercase tracking-wider border-b border-ink/8">
             <th className="pb-3 pr-4 font-semibold">Date</th>
             <th className="pb-3 pr-4 font-semibold">Subject</th>
+            <th className="pb-3 pr-4 font-semibold">Task</th>
             <th className="pb-3 pr-4 font-semibold">Duration</th>
-            <th className="pb-3 pr-4 font-semibold hidden sm:table-cell">Time</th>
-            <th className="pb-3 pr-4 font-semibold hidden md:table-cell">Difficulty</th>
-            <th className="pb-3 font-semibold hidden lg:table-cell">Notes</th>
+            <th className="pb-3 font-semibold hidden md:table-cell">Lesson / Topic</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-ink/5">
           {sessions.map(s => (
             <tr key={s.id} className="hover:bg-ink/2 transition-colors">
-              <td className="py-3.5 pr-4 text-ink/50 whitespace-nowrap">{formatDate(s.start_time)}</td>
+              <td className="py-3.5 pr-4 text-ink/50 whitespace-nowrap">
+                {formatDate(s.start_time)}
+                <span className="block text-xs text-ink/30">{formatTime(s.start_time)}</span>
+              </td>
               <td className="py-3.5 pr-4 font-semibold text-ink">{s.subject}</td>
+              <td className="py-3.5 pr-4">
+                {s.task_type ? (
+                  <Badge
+                    label={`${TASK_ICONS[s.task_type]} ${s.task_type}`}
+                    color={TASK_COLORS[s.task_type]}
+                  />
+                ) : '—'}
+              </td>
               <td className="py-3.5 pr-4 font-mono text-sage font-semibold">
                 {s.duration ? formatDuration(s.duration) : (
                   <span className="text-amber text-xs">ongoing</span>
                 )}
               </td>
-              <td className="py-3.5 pr-4 text-ink/40 whitespace-nowrap hidden sm:table-cell">
-                {formatTime(s.start_time)}
-                {s.end_time && <> – {formatTime(s.end_time)}</>}
-              </td>
-              <td className="py-3.5 pr-4 hidden md:table-cell">
-                {s.difficulty && (
-                  <Badge label={s.difficulty} color={DIFFICULTY_COLORS[s.difficulty]} />
-                )}
-              </td>
-              <td className="py-3.5 text-ink/40 max-w-xs truncate hidden lg:table-cell">
-                {s.notes || '—'}
+              <td className="py-3.5 text-ink/50 max-w-xs truncate hidden md:table-cell">
+                {s.lesson_name || '—'}
               </td>
             </tr>
           ))}
