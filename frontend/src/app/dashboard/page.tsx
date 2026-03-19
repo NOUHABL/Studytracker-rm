@@ -19,6 +19,7 @@ const TASK_CONFIG: Record<TaskType, { icon: string; color: string; label: string
 
 // ── BEM Countdown ─────────────────────────────────────────────
 const BEM_DATE = new Date('2026-05-19T08:00:00');
+
 interface TimeLeft { days: number; hours: number; minutes: number; seconds: number; over: boolean; }
 
 function calc(): TimeLeft {
@@ -76,7 +77,7 @@ function BEMCountdown() {
         <div>
           <p className="text-paper/70 text-xs font-semibold uppercase tracking-widest mb-0.5">Countdown to</p>
           <h2 className="font-display text-2xl font-bold">BEM Exam 2026</h2>
-          <p className="text-paper/60 text-xs mt-0.5">June 1st, 2026 at 8:00 AM</p>
+          <p className="text-paper/60 text-xs mt-0.5">May 19th, 2026 at 8:00 AM</p>
         </div>
         <div className="flex items-center gap-3">
           {units.map((u, i) => (

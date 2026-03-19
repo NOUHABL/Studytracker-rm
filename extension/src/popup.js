@@ -10,6 +10,7 @@ let timerInterval = null;
 
 // ── BEM Countdown ─────────────────────────────────────────────
 const BEM_DATE = new Date('2026-05-19T08:00:00');
+
 function tickBEM() {
   const diff = BEM_DATE.getTime() - Date.now();
   const bem  = $('bem');
